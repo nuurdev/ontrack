@@ -2,12 +2,13 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Spinner from "react-bootstrap/Spinner";
 
-import { useNavigate } from "@reach/router";
-import { defaultSettings } from "../utils";
 import { Select } from "./select";
 import { Search } from "./search";
 import { Pagination } from "./pagination";
+import { useNavigate } from "@reach/router";
+import { defaultSettings } from "../utils";
 import { TableComponent } from "./table";
 import { ErrorComponent } from "./error";
 import { useBookQuery } from "./hooks/useBookQuery";
@@ -25,16 +26,14 @@ const App = () => {
 
   const handleItemsPerPageChange = (e) => {
     const { value } = e.target;
-
     const newPageCount = Math.ceil(data.count / value);
-
-    newPageCount < page
-      ? navigate(
-          `/?page=${newPageCount}&itemsPerPage=${value}&searchTerm=${searchTerm}`
-        )
-      : navigate(
-          `/?page=${page}&itemsPerPage=${value}&searchTerm=${searchTerm}`
-        );
+    if (newPageCount < page) {
+      navigate(
+        `/?page=${newPageCount}&itemsPerPage=${value}&searchTerm=${searchTerm}`
+      );
+    } else {
+      navigate(`/?page=${page}&itemsPerPage=${value}&searchTerm=${searchTerm}`);
+    }
   };
 
   const handleSearch = (searchTermString) => {
@@ -54,9 +53,11 @@ const App = () => {
       </div>
 
       <Row className="controls-wrapper">
-        <Col xs={9} sm={6}>
-          <Search onSearch={handleSearch} disabled={loading} />
-        </Col>
+        {data && (
+          <Col xs={9} sm={6}>
+            <Search onSearch={handleSearch} disabled={loading} />
+          </Col>
+        )}
 
         {data && data.books.length > 0 && (
           <Col xs={"auto"}>
@@ -85,14 +86,14 @@ const App = () => {
       {data && (
         <Row>
           <>
-            <Col sm={10}>
+            <Col xs={6}>
               <span>
                 Returned <strong>{data.count}</strong> result(s)
                 {`${searchTerm && ` for ${searchTerm}`}`}
               </span>
             </Col>
             {data && data.books.length > 0 && (
-              <Col sm={1}>
+              <Col xs={6}>
                 <span>
                   Page <strong>{page}</strong> of{" "}
                   {Math.ceil(data.count / itemsPerPage)}
@@ -100,6 +101,14 @@ const App = () => {
               </Col>
             )}
           </>
+        </Row>
+      )}
+
+      {loading && !data && (
+        <Row>
+          <Col>
+            <Spinner animation="grow" variant="primary" />
+          </Col>
         </Row>
       )}
 

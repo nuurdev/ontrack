@@ -6,10 +6,10 @@ import Row from "react-bootstrap/Row";
 export const Select = ({ onChange, value, options, label, disabled }) => (
   <fieldset disabled={disabled}>
     <Form.Group as={Row}>
-      <Form.Label column sm="7">
+      <Form.Label column sm="auto">
         {label}
       </Form.Label>
-      <Col sm="5">
+      <Col>
         <Form.Control as="select" onChange={onChange} value={value}>
           {options.map((option) => (
             <option key={option}>{option}</option>
