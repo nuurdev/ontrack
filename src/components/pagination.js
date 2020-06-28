@@ -21,7 +21,7 @@ export const Pagination = ({ onChange, data, page, itemsPerPage }) => (
     previousLinkClassName={"page-link"}
     nextClassName={"page-item"}
     nextLinkClassName={"page-link"}
-    initialPage={page - 1}
+    forcePage={page - 1}
     disableInitialCallback
   />
 );
