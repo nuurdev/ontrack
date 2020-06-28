@@ -107,7 +107,7 @@ const App = () => {
       {loading && !data && (
         <Row>
           <Col>
-            <Spinner animation="grow" variant="primary" />
+            <Spinner animation="border" variant="primary" />
           </Col>
         </Row>
       )}
