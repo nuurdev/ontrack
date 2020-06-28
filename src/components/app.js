@@ -63,41 +63,37 @@ function App() {
 
   const handleItemsPerPageChange = (e) => {
     const { value } = e.target;
-    navigate(`/?page=${page}&itemsPerPage=${value}&searchTerm=${searchTerm}`);
+
+    const newPageCount = Math.ceil(data.count / value);
+
+    newPageCount < page
+      ? navigate(
+          `/?page=${newPageCount}&itemsPerPage=${value}&searchTerm=${searchTerm}`
+        )
+      : navigate(
+          `/?page=${page}&itemsPerPage=${value}&searchTerm=${searchTerm}`
+        );
   };
 
   const handleSearch = (searchTermString) => {
     navigate(
-      `/?page=${page}&itemsPerPage=${itemsPerPage}&searchTerm=${searchTermString}`
+      `/?page=${1}&itemsPerPage=${itemsPerPage}&searchTerm=${searchTermString}`
     );
   };
 
   return (
     <Container fluid className="my-5">
-      <Row className="header-wrapper">
-        <Col xs={12} className="my-3">
-          <h2>OnTrack Application</h2>
-        </Col>
-      </Row>
+      <div className="my-3">
+        <h2>OnTrack Application</h2>
+      </div>
 
       <Row className="controls-wrapper">
-        <Col xs={12} lg={4}>
+        <Col xs={9} sm={6}>
           <Search onSearch={handleSearch} disabled={loading} />
         </Col>
 
         {data && data.books.length > 0 && (
-          <Col xs={12} lg={4}>
-            <Pagination
-              onChange={handlePageChange}
-              data={data}
-              page={page}
-              itemsPerPage={itemsPerPage}
-            />
-          </Col>
-        )}
-
-        {data && data.books.length > 0 && (
-          <Col sm={12} lg={4}>
+          <Col xs={"auto"}>
             <Select
               onChange={handleItemsPerPageChange}
               value={itemsPerPage}
@@ -108,15 +104,38 @@ function App() {
           </Col>
         )}
 
-        {data && (
+        {data && data.books.length > 0 && (
           <Col sm={12}>
-            <span>
-              Returned <strong>{data.count}</strong> results
-              {`${searchTerm && ` for ${searchTerm}`}`}
-            </span>
+            <Pagination
+              onChange={handlePageChange}
+              data={data}
+              page={searchParams.page}
+              itemsPerPage={itemsPerPage}
+            />
           </Col>
         )}
       </Row>
+
+      {data && (
+        <Row>
+          <>
+            <Col sm={10}>
+              <span>
+                Returned <strong>{data.count}</strong> result(s)
+                {`${searchTerm && ` for ${searchTerm}`}`}
+              </span>
+            </Col>
+            {data && data.books.length > 0 && (
+              <Col sm={1}>
+                <span>
+                  Page <strong>{page}</strong> of{" "}
+                  {Math.ceil(data.count / itemsPerPage)}
+                </span>
+              </Col>
+            )}
+          </>
+        </Row>
+      )}
 
       {data && data.books.length > 0 && (
         <Row className="table-wrapper mt-4">
