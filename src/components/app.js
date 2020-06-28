@@ -3,6 +3,8 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 
 import { Select } from "./select";
 import { Search } from "./search";
@@ -40,6 +42,10 @@ const App = () => {
     navigate(
       `/?page=${1}&itemsPerPage=${itemsPerPage}&searchTerm=${searchTermString}`
     );
+  };
+
+  const handleRemoveSearch = () => {
+    navigate(`/?page=${1}&itemsPerPage=${itemsPerPage}`);
   };
 
   if (error) {
@@ -89,8 +95,19 @@ const App = () => {
             <Col xs={6}>
               <span>
                 Returned <strong>{data.count}</strong> result(s)
-                {`${searchTerm && ` for ${searchTerm}`}`}
+                {searchTerm && ` for `}
               </span>
+              {searchTerm && (
+                <Badge
+                  pill
+                  variant="secondary"
+                  as={Button}
+                  aria-label="Remove search"
+                  onClick={handleRemoveSearch}
+                >
+                  {searchTerm} x
+                </Badge>
+              )}
             </Col>
             {data && data.books.length > 0 && (
               <Col xs={6}>
