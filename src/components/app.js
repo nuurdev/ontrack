@@ -4,14 +4,15 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import { useLocation, useNavigate } from "@reach/router";
-import { defaultSettings } from "../utils";
+import { defaultSettings, handleErrors } from "../utils";
 import { parse } from "query-string";
 import { Select } from "./select";
 import { Search } from "./search";
 import { Pagination } from "./pagination";
 import { TableComponent } from "./table";
+import { ErrorComponent } from "./error";
 
-function App() {
+const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = parse(location.search);
@@ -32,9 +33,11 @@ function App() {
 
   const [data, setData] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
     setLoading(true);
+    setError(null);
     const body = {
       page,
       itemsPerPage,
@@ -48,10 +51,14 @@ function App() {
         "Content-Type": "application/json",
       },
     })
+      .then(handleErrors)
       .then((response) => response.json())
       .then((data) => setData(data))
-      .then(() => setLoading(false));
-    // handle error
+      .then(() => setLoading(false))
+      .catch((err) => {
+        console.error(err);
+        setError(err);
+      });
   }, [page, itemsPerPage, searchTerm]);
 
   const handlePageChange = (data) => {
@@ -81,6 +88,10 @@ function App() {
     );
   };
 
+  if (error) {
+    return <ErrorComponent message={error.message} />;
+  }
+
   return (
     <Container fluid className="my-5">
       <div className="my-3">
@@ -105,11 +116,11 @@ function App() {
         )}
 
         {data && data.books.length > 0 && (
-          <Col sm={12}>
+          <Col sm={12} style={{ overflowX: "auto" }}>
             <Pagination
               onChange={handlePageChange}
               data={data}
-              page={searchParams.page}
+              page={page}
               itemsPerPage={itemsPerPage}
             />
           </Col>
@@ -142,10 +153,21 @@ function App() {
           <Col>
             <TableComponent data={data} loading={loading} />
           </Col>
+
+          {data && data.books.length > 0 && (
+            <Col sm={12} style={{ overflowX: "auto" }}>
+              <Pagination
+                onChange={handlePageChange}
+                data={data}
+                page={page}
+                itemsPerPage={itemsPerPage}
+              />
+            </Col>
+          )}
         </Row>
       )}
     </Container>
   );
-}
+};
 
 export default App;
