@@ -1,7 +1,7 @@
 import React from "react";
-import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import InputGroup from "react-bootstrap/InputGroup";
 
 export const Search = ({ onSearch, disabled }) => (
   <fieldset disabled={disabled}>
@@ -12,22 +12,18 @@ export const Search = ({ onSearch, disabled }) => (
         onSearch(value);
       }}
     >
-      <Form.Row>
-        <Col>
-          <Form.Group>
-            <Form.Control
-              name="search"
-              placeholder={"Search for a book"}
-              aria-label="Search for a book"
-            />
-          </Form.Group>
-        </Col>
-        <Col>
+      <InputGroup>
+        <Form.Control
+          name="search"
+          placeholder={"Search for a book"}
+          aria-label="Search for a book"
+        />
+        <InputGroup.Append>
           <Button variant="primary" type="submit">
-            Submit
+            Search
           </Button>
-        </Col>
-      </Form.Row>
+        </InputGroup.Append>
+      </InputGroup>
     </Form>
   </fieldset>
 );
