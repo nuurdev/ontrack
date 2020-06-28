@@ -3,63 +3,18 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import { useLocation, useNavigate } from "@reach/router";
-import { defaultSettings, handleErrors } from "../utils";
-import { parse } from "query-string";
+import { useNavigate } from "@reach/router";
+import { defaultSettings } from "../utils";
 import { Select } from "./select";
 import { Search } from "./search";
 import { Pagination } from "./pagination";
 import { TableComponent } from "./table";
 import { ErrorComponent } from "./error";
+import { useBookQuery } from "./hooks/useBookQuery";
 
 const App = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const searchParams = parse(location.search);
-
-  const getItemsPerPage = () => {
-    if (
-      defaultSettings.itemsPerPageOptions.includes(+searchParams.itemsPerPage)
-    ) {
-      return +searchParams.itemsPerPage;
-    } else {
-      return defaultSettings.itemsPerPage;
-    }
-  };
-
-  const page = +searchParams.page || defaultSettings.page;
-  const searchTerm = searchParams.searchTerm || defaultSettings.searchTerm;
-  const itemsPerPage = getItemsPerPage();
-
-  const [data, setData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    setLoading(true);
-    setError(null);
-    const body = {
-      page,
-      itemsPerPage,
-      filters: [{ type: "all", values: [searchTerm] }],
-    };
-
-    fetch(`http://nyx.vima.ekt.gr:3000/api/books/`, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(handleErrors)
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .then(() => setLoading(false))
-      .catch((err) => {
-        console.error(err);
-        setError(err);
-      });
-  }, [page, itemsPerPage, searchTerm]);
+  const [page, searchTerm, itemsPerPage, data, loading, error] = useBookQuery();
 
   const handlePageChange = (data) => {
     const newPage = Number(data.selected) + 1;
@@ -153,17 +108,6 @@ const App = () => {
           <Col>
             <TableComponent data={data} loading={loading} />
           </Col>
-
-          {data && data.books.length > 0 && (
-            <Col sm={12} style={{ overflowX: "auto" }}>
-              <Pagination
-                onChange={handlePageChange}
-                data={data}
-                page={page}
-                itemsPerPage={itemsPerPage}
-              />
-            </Col>
-          )}
         </Row>
       )}
     </Container>
